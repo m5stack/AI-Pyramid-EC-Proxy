@@ -1,0 +1,11 @@
+from pathlib import Path
+import os
+import shutil
+
+os.environ['SDK_PATH'] = os.path.normpath(str(Path(os.getcwd())/'..'/'..'/'SDK'))
+os.environ['EXT_COMPONENTS_PATH'] = os.path.normpath(str(Path(os.getcwd())/'..'/'..'/'ext_components'))
+
+
+with open(str(Path(os.getcwd())/'..'/'..'/'SDK'/'tools'/'scons'/'project.py')) as f:
+    exec(f.read())
+
