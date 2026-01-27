@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 M5Stack Technology CO LTD
+ *
+ * SPDX-License-Identifier: MIT
+ */
 #include <iostream>
 #include <modbus.h>
 #include "pzmq.hpp"
@@ -187,20 +192,20 @@ void exec_fun(cmdline::parser &a)
     if (a.exist("list")) {
         StackFlows::pzmq Context(rpc_socket_path);
         std::cout << "list" << std::endl;
-        Context.call_rpc_action("list_action", "None",
-                                [](StackFlows::pzmq *_pzmq, const std::shared_ptr<StackFlows::pzmq_data> &data) {
-                                    if (data->size() > 0) {
-                                        try {
-                                            nlohmann::json _data = nlohmann::json::parse(data->string());
-                                            std::cout << _data.dump(4) << std::endl;
-                                        } catch (const nlohmann::json::parse_error &e) {
-                                            std::cerr << "JSON parsing failed for list_action response. Error: " << e.what() 
-                                                      << ". Invalid JSON data received: " << data->string() << std::endl;
-                                        }
-                                    } else {
-                                        std::cout << "call list_action faile!" << std::endl;
-                                    }
-                                });
+        Context.call_rpc_action(
+            "list_action", "None", [](StackFlows::pzmq *_pzmq, const std::shared_ptr<StackFlows::pzmq_data> &data) {
+                if (data->size() > 0) {
+                    try {
+                        nlohmann::json _data = nlohmann::json::parse(data->string());
+                        std::cout << _data.dump(4) << std::endl;
+                    } catch (const nlohmann::json::parse_error &e) {
+                        std::cerr << "JSON parsing failed for list_action response. Error: " << e.what()
+                                  << ". Invalid JSON data received: " << data->string() << std::endl;
+                    }
+                } else {
+                    std::cout << "call list_action faile!" << std::endl;
+                }
+            });
         return;
     }
 
