@@ -284,6 +284,38 @@ private:
         }
     }
 
+    void select_power_low()
+    {
+        uint16_t tab_reg[12];
+        int rc = modbus_read_input_registers(modbus_ctx, 0, 12, tab_reg);
+        if (rc == -1) {
+            return;
+        }
+        if (tab_reg[8] < 8000)
+        {
+            uint16_t cmd = 4;
+            if (modbus_write_registers(modbus_ctx, 13, 1, &cmd) == -1) {
+                return;
+            }
+            std::string data = "\x7F""100:Power Supply""\x0A""Not Support!";
+            std::vector<uint16_t> tab_regs;
+            std::transform(data.begin(), data.end(), 
+                std::back_inserter(tab_regs),
+                [](char c) -> uint16_t { 
+                    return static_cast<uint16_t>(static_cast<unsigned char>(c)); // 双重cast，意图清晰
+                });
+
+            for (size_t i = 0; i < tab_regs.size(); i++)
+            {
+                if (modbus_write_registers(modbus_ctx, 14, 1, tab_regs.data() + i) == -1) {
+                    return;
+                }
+            }
+        }
+    }
+
+
+
     uint16_t rgb888_to_rgb565(uint32_t rgb888)
     {
         // 提取红、绿、蓝分量
@@ -962,13 +994,13 @@ public:
                     }
                 }
                 if (tab_reg[1]) {
-                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":0,\"vale\":0}"));
+                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":0,\"value\":0}"));
                 }
                 if (tab_reg[2]) {
-                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":1,\"vale\":0}"));
+                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":1,\"value\":0}"));
                 }
                 if (tab_reg[3]) {
-                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":2,\"vale\":0}"));
+                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":2,\"value\":0}"));
                 }
             }
             if (ec_button[1]) {
@@ -982,13 +1014,13 @@ public:
                     }
                 }
                 if (tab_reg[1]) {
-                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":0,\"vale\":1}"));
+                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":0,\"value\":1}"));
                 }
                 if (tab_reg[2]) {
-                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":1,\"vale\":1}"));
+                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":1,\"value\":1}"));
                 }
                 if (tab_reg[3]) {
-                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":2,\"vale\":1}"));
+                    pub_ctx_->send_data(return_success_result(__func__, "{\"code\":2,\"value\":1}"));
                 }
             }
             CORO_YIELD(ec);
@@ -1029,10 +1061,10 @@ public:
                     if (n == (ssize_t)sizeof(ev)) {
                         // printf("type:%d, code:%d, value:%d\n", ev.type, ev.code, ev.value);
                         if (ev.value == 1 && ev.code == 204) {
-                            pub_ctx_->send_data(return_success_result(__func__, "{\"code\":1,\"vale\":204}"));
+                            pub_ctx_->send_data(return_success_result(__func__, "{\"code\":1,\"value\":204}"));
                         }
                         if (ev.value == 0 && ev.code == 204) {
-                            pub_ctx_->send_data(return_success_result(__func__, "{\"code\":0,\"vale\":204}"));
+                            pub_ctx_->send_data(return_success_result(__func__, "{\"code\":0,\"value\":204}"));
                         }
                     }
                 }
@@ -1188,6 +1220,8 @@ public:
             tab_reg = atoi(env_param);
         }
         modbus_write_registers(modbus_ctx, 0, 1, &tab_reg);
+
+        select_power_low() ;
     }
 
     int is_poweroff_or_reboot()

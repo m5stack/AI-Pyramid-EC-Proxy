@@ -24,7 +24,7 @@ LDFLAGS+=['-Wl,-rpath=/opt/m5stack/lib', '-Wl,-rpath=/usr/local/m5stack/lib', '-
 
 
 SRCS = [AFile('src/ec_proxy_main.cpp')]
-env['COMPONENTS'].append({'target':'ec_proxy-1.0',
+env['COMPONENTS'].append({'target':'ec_proxy-1.1',
                           'SRCS':SRCS,
                           'INCLUDE':INCLUDE,
                           'PRIVATE_INCLUDE':PRIVATE_INCLUDE,

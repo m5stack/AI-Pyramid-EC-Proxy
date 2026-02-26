@@ -1,10 +1,13 @@
 from pathlib import Path
 import os
 import shutil
+import platform
 
 os.environ['SDK_PATH'] = os.path.normpath(str(Path(os.getcwd())/'..'/'..'/'SDK'))
 os.environ['EXT_COMPONENTS_PATH'] = os.path.normpath(str(Path(os.getcwd())/'..'/'..'/'ext_components'))
 
+if platform.machine() != 'aarch64':
+    os.environ['CONFIG_TOOLCHAIN_PATH'] ="/opt/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin"
 
 with open(str(Path(os.getcwd())/'..'/'..'/'SDK'/'tools'/'scons'/'project.py')) as f:
     exec(f.read())
