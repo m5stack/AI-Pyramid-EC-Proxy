@@ -156,6 +156,14 @@ projects/ec_proxy/build/
 
 ## Installation
 
+### Online Installation
+```bash
+wget -qO /etc/apt/keyrings/StackFlow.gpg https://repo.llm.m5stack.com/m5stack-apt-repo/key/StackFlow.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/StackFlow.gpg] https://repo.llm.m5stack.com/m5stack-apt-repo ax650c main' | tee /etc/apt/sources.list.d/axclhost.list 
+apt update
+apt install ec-proxy
+```
+
 ### Deploy to Target Device
 
 ```bash
